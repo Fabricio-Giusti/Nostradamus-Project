@@ -1,42 +1,30 @@
-<<<<<<< HEAD
-# Nostradamus-Project
-=======
 # Nostradamus — Hurricane Probability Predictor
 
 > **Predict the likelihood of a hurricane striking any location on Earth, for any month of the year.**
 
-A Python-based tool that analyzes the complete [IBTrACS](https://www.ncei.noaa.gov/products/international-best-track-archive) historical cyclone dataset to calculate hurricane probabilities and generate interactive heatmaps.
-
-Developed as an individual Dream Project for **ENGR 13300 — Transforming Ideas to Innovation** at Purdue University (Fall 2024).
+A Python-based tool that analyzes the complete [IBTrACS](https://www.ncei.noaa.gov/products/international-best-track-archive) historical cyclone dataset to calculate hurricane probabilities and generate interactive global heatmaps.
 
 ---
 
 ## Features
 
-- **Location Search** — Enter any city name and get accurate geocoding via [OpenStreetMap Nominatim](https://nominatim.openstreetmap.org/)
+- **Location Search** — Enter any city name and get accurate geocoding via the [OpenStreetMap Nominatim](https://nominatim.openstreetmap.org/) API
 - **Monthly Probability** — Calculates the historical probability of a hurricane occurring within ±5° of your location for a chosen month
 - **Interactive Heatmap** — Generates a global [Folium](https://python-visualization.github.io/folium/) heatmap showing cyclone intensity for the selected month, with your location pinned on the map
-- **Risk Classification** — Categorizes the risk level (Low / Moderate / High / Extreme) and displays it as a tooltip on the map
-- **Full Historical Data** — Uses the IBTrACS v04r01 dataset covering **all ocean basins** from 1842 to present (~300k+ records)
+- **Risk Classification** — Categorizes the risk level (Very Low / Low / Moderate / High / Extreme) and displays it as a tooltip on the map
+- **Full Historical Data** — Uses the IBTrACS v04r01 dataset covering all ocean basins from 1842 to present (~3 million track records)
 
 ---
 
 ## Repository Structure
 
 ```
-├── Nostradamus (early access).py   # Original version of the program
-├── Nostradamus_improved.py         # Refactored & optimized version
+├── Nostradamus (early access).py   # Original version — procedural style
+├── Nostradamus_improved.py         # Refactored version — vectorized Pandas operations
 ├── location.py                     # Geocoding helper module
-├── PROJECT_EXPLANATION.md          # Detailed project documentation
+├── PROJECT_EXPLANATION.md          # Detailed documentation of architecture and algorithms
 └── README.md
 ```
-
-| File | Description |
-|------|-------------|
-| `Nostradamus (early access).py` | First working version — procedural style with manual loops |
-| `Nostradamus_improved.py` | Improved version — vectorized Pandas operations, cleaner structure, better error handling |
-| `location.py` | Utility function that converts a city name to latitude/longitude using OpenStreetMap |
-| `PROJECT_EXPLANATION.md` | In-depth documentation of the project architecture and algorithms |
 
 ---
 
@@ -44,41 +32,34 @@ Developed as an individual Dream Project for **ENGR 13300 — Transforming Ideas
 
 ### Prerequisites
 
-- **Python 3.8+**
-- Required packages:
+- Python 3.8+
 
 ```bash
 pip install pandas folium branca requests
 ```
 
-### Running the Program
+### Dataset
 
-1. **Clone this repository:**
+This project requires the **IBTrACS v04r01** dataset (~310 MB), which is too large to include in the repository.
+
+1. Go to the [NOAA NCEI IBTrACS page](https://www.ncei.noaa.gov/data/international-best-track-archive-for-climate-stewardship-ibtracs/v04r01/access/csv/)
+2. Download `ibtracs.ALL.list.v04r01.csv`
+3. Rename it to `ALL.csv` and place it in the project root directory
+
+### Running the Program
 
 ```bash
 git clone https://github.com/Fabricio-Giusti/Nostradamus-Project.git
 cd Nostradamus-Project
-```
-
-2. **Download the dataset:**
-   - Go to the [IBTrACS NOAA page](https://www.ncei.noaa.gov/data/international-best-track-archive-for-climate-stewardship-ibtracs/v04r01/access/csv/)
-   - Download `ibtracs.ALL.list.v04r01.csv`
-   - Rename it to `ALL.csv` and place it in the project root directory
-
-3. **Run the improved version:**
-
-```bash
 python Nostradamus_improved.py
 ```
 
-4. **Follow the prompts:**
-   - Enter a city name (e.g., `Miami`, `Tokyo, Japan`)
-   - Confirm the location found
-   - Select a month (1–12)
+Follow the prompts:
+1. Enter a city name (e.g., `Miami`, `Tokyo, Japan`)
+2. Confirm the location found
+3. Select a month (1–12)
 
-5. **View the results:**
-   - The terminal will display the hurricane probability percentage
-   - An interactive heatmap will automatically open in your default browser
+The terminal will display the hurricane probability and risk level. An interactive heatmap will automatically open in your browser.
 
 ---
 
@@ -110,10 +91,20 @@ User Input (City + Month)
 └──────────────────────┘
 ```
 
-1. The user provides a city name, which is geocoded to latitude and longitude
-2. The program reads `ALL.csv` and filters hurricane records that fall within a **±5 degree** radius of the user's location for the chosen month
-3. The number of **unique hurricanes** (by Storm ID) is divided by the **total number of years** in the dataset to compute a probability
-4. An interactive heatmap is generated showing all cyclone track points for that month worldwide, with the user's location marked
+1. The user's city is geocoded to latitude and longitude via the OpenStreetMap API
+2. The IBTrACS dataset is filtered to records within a ±5° bounding box around the location for the selected month
+3. Unique Storm IDs are counted and divided by the total years in the dataset to compute the probability
+4. An interactive heatmap is generated with all global cyclone track points for that month and the user's location marked
+
+### Risk Classification
+
+| Probability | Risk Level |
+|-------------|------------|
+| 0% | Very Low — no historical hurricanes recorded |
+| < 10% | Low Risk |
+| 10% – 29% | Moderate Risk |
+| 30% – 49% | High Risk |
+| ≥ 50% | Extreme Risk |
 
 ---
 
@@ -128,24 +119,12 @@ The probability of a hurricane in Miami during September is 42.86%.
 
 ---
 
-## Dataset
-
-This project requires the **IBTrACS v04r01** (International Best Track Archive for Climate Stewardship) dataset, which is too large (~310 MB) to include in the repository.
-
-**Download:** [ibtracs.ALL.list.v04r01.csv](https://www.ncei.noaa.gov/data/international-best-track-archive-for-climate-stewardship-ibtracs/v04r01/access/csv/) from NOAA NCEI. Rename the file to `ALL.csv` and place it in the project root.
-
-- **Coverage:** All ocean basins worldwide
-- **Time span:** 1842 – present
-- **Columns used:** `SID` (Storm ID), `ISO_TIME` (timestamp), `LAT` (latitude), `LON` (longitude)
-
----
-
 ## Technologies
 
 | Tool | Purpose |
 |------|---------|
-| [Python](https://python.org) | Core programming language |
-| [Pandas](https://pandas.pydata.org/) | Data processing and filtering |
+| [Python](https://python.org) | Core language |
+| [Pandas](https://pandas.pydata.org/) | Data processing and vectorized filtering |
 | [Folium](https://python-visualization.github.io/folium/) | Interactive map generation |
 | [Branca](https://github.com/python-visualization/branca) | Colormap legend on the heatmap |
 | [Requests](https://docs.python-requests.org/) | HTTP calls to the geocoding API |
@@ -155,13 +134,11 @@ This project requires the **IBTrACS v04r01** (International Best Track Archive f
 
 ## Author
 
-**Fabricio Giusti Oliveira Monteiro**  
-Purdue University — ENGR 13300 (Fall 2024)  
-fgiustio@purdue.edu
+**Fabricio Giusti Oliveira Monteiro**
+[linkedin.com/in/fabricio-giusti](https://linkedin.com/in/fabricio-giusti)
 
 ---
 
 ## License
 
-This project was developed for academic purposes at Purdue University. The IBTrACS dataset is provided by NOAA and is publicly available.
->>>>>>> 3a37171 (Initial commit)
+The IBTrACS dataset is provided by NOAA and is publicly available for non-commercial use.
